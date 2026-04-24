@@ -25,6 +25,13 @@ PipeProfit is a static web page designed to introduce and promote a service focu
 -   ✨ **Modern UI/UX**: Presents a professional and engaging user interface suitable for a business-oriented audience.
 
 ## 🖥️ Screenshots
+<img width="1668" height="1032" alt="{74F39FE5-3D6E-45B3-A683-D3B11D9874E4}" src="https://github.com/user-attachments/assets/000c131a-f569-48ad-a46e-c1a7ecd8d3ab" />
+<img width="1666" height="1035" alt="{D65E41CD-9836-4476-948C-D3446A543069}" src="https://github.com/user-attachments/assets/27cf09ef-de92-4b0e-88ed-141e5947fb07" />
+<img width="1675" height="1034" alt="{3869DFFD-BA96-4C36-A8B1-8CFEB9D2EE78}" src="https://github.com/user-attachments/assets/595b8047-990f-46bc-8f62-f282f3f664be" />
+<img width="1667" height="1035" alt="{65CBAAB8-147C-4C7F-9687-3AAE4B182D3C}" src="https://github.com/user-attachments/assets/c7723b0f-0fd0-4e60-993e-0a2921ba3adc" />
+
+
+
 
 <!-- TODO: Add actual screenshots of the landing page -->
 
@@ -81,13 +88,6 @@ We welcome contributions! As this is a static landing page, contributions might 
 -   Improving content clarity and messaging.
 -   Enhancing UI/UX design and responsiveness.
 -   Adding new sections or features relevant to a landing page.
-
-Please feel free to fork the repository and submit pull requests.
-
-## 📄 License
-
-This project is licensed under the [LICENSE_NAME](LICENSE) - see the LICENSE file for details.
-<!-- TODO: Add a LICENSE file to the repository if an open-source license is intended. -->
 
 ## 🙏 Acknowledgments
 
