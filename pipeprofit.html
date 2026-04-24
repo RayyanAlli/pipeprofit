@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PipeProfit — Never Miss a Plumbing Call Again</title>
+<meta name="description" content="PipeProfit gives local US plumbers a 24/7 intelligent call system — IVR menus + AI backup assistant — so every lead gets answered, every time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0a0c10;
+    --bg2:       #0f1218;
+    --bg3:       #141820;
+    --panel:     #1a1f2b;
+    --border:    rgba(255,255,255,0.07);
+    --copper:    #e8731a;
+    --copper2:   #f59840;
+    --copper-glow: rgba(232,115,26,0.18);
+    --teal:      #12d4c8;
+    --text:      #e8eaf0;
+    --text2:     #8b91a0;
+    --text3:     #5a6070;
+    --white:     #ffffff;
+    --radius:    12px;
+    --radius-lg: 20px;
+    --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ─── Noise texture overlay ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ─── Typography ─── */
+  h1,h2,h3,h4,h5 { font-family: 'Syne', sans-serif; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+
+  .label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--copper);
+    margin-bottom: 16px;
+  }
+  .label::before { content: ''; width: 20px; height: 2px; background: var(--copper); border-radius: 2px; }
+
+  /* ─── Layout ─── */
+  .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 100px 0; }
+
+  /* ─── Nav ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    padding: 0 32px;
+    background: rgba(10,12,16,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
+  }
+  .nav-inner {
+    max-width: 1160px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px;
+    color: var(--white); text-decoration: none; display: flex; align-items: center; gap: 8px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px; background: var(--copper);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .logo span { color: var(--copper); }
+
+  .nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
+  .nav-links a {
+    font-size: 14px; font-weight: 500; color: var(--text2);
+    text-decoration: none; transition: color var(--transition);
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  .nav-cta {
+    background: var(--copper); color: var(--white);
+    padding: 10px 22px; border-radius: 8px;
+    font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    text-decoration: none; transition: background var(--transition), transform var(--transition);
+    white-space: nowrap;
+  }
+  .nav-cta:hover { background: var(--copper2); transform: translateY(-1px); }
+
+  .nav-mobile-btn { display: none; background: none; border: none; cursor: pointer; color: var(--white); }
+
+  /* ─── Hero ─── */
+  #home {
+    padding-top: 160px; padding-bottom: 120px;
+    position: relative; overflow: hidden;
+    min-height: 100vh; display: flex; align-items: center;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  }
+  .hero-orb {
+    position: absolute; border-radius: 50%; filter: blur(80px);
+  }
+  .orb1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(232,115,26,0.2) 0%, transparent 70%);
+    top: -100px; right: -100px;
+  }
+  .orb2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(18,212,200,0.1) 0%, transparent 70%);
+    bottom: -50px; left: -50px;
+  }
+
+  /* Pipe lines decoration */
+  .pipe-lines {
+    position: absolute; top: 0; right: 0; width: 50%; height: 100%;
+    opacity: 0.06;
+  }
+
+  .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(232,115,26,0.12); border: 1px solid rgba(232,115,26,0.3);
+    color: var(--copper2); padding: 6px 14px; border-radius: 100px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.05em;
+    margin-bottom: 24px;
+  }
+  .hero-badge::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  h1.hero-title {
+    font-size: clamp(42px, 5vw, 68px);
+    color: var(--white); margin-bottom: 24px;
+  }
+  h1.hero-title .accent { color: var(--copper); }
+  h1.hero-title .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--copper), var(--copper2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 18px; color: var(--text2); line-height: 1.7;
+    max-width: 500px; margin-bottom: 40px;
+  }
+
+  .hero-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--copper); color: var(--white);
+    padding: 14px 30px; border-radius: 10px;
+    font-size: 15px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: all var(--transition); display: inline-flex; align-items: center; gap: 8px;
+    box-shadow: 0 0 40px rgba(232,115,26,0.3);
+  }
+  .btn-primary:hover { background: var(--copper2); transform: translateY(-2px); box-shadow: 0 8px 50px rgba(232,115,26,0.4); }
+  .btn-secondary {
+    background: transparent; color: var(--text);
+    padding: 14px 30px; border-radius: 10px;
+    font-size: 15px; font-weight: 500; font-family: 'DM Sans', sans-serif;
+    text-decoration: none; border: 1px solid var(--border); cursor: pointer;
+    transition: all var(--transition); display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.2); color: var(--white); background: rgba(255,255,255,0.04); }
+
+  .hero-stats {
+    display: flex; gap: 32px; margin-top: 48px; padding-top: 48px;
+    border-top: 1px solid var(--border);
+  }
+  .stat { }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--white); }
+  .stat-num span { color: var(--copper); }
+  .stat-label { font-size: 13px; color: var(--text3); margin-top: 2px; }
+
+  /* Hero phone mockup */
+  .hero-visual { position: relative; display: flex; justify-content: center; }
+  .phone-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px;
+    width: 340px;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+    position: relative;
+  }
+  .phone-card::before {
+    content: ''; position: absolute; inset: -1px; border-radius: 24px;
+    background: linear-gradient(135deg, rgba(232,115,26,0.3) 0%, transparent 50%);
+    z-index: -1;
+  }
+  .phone-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+  }
+  .phone-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+
+  .call-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 10px; margin-bottom: 10px;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    animation: slideIn 0.5s ease forwards;
+    opacity: 0;
+  }
+  .call-item:nth-child(1) { animation-delay: 0.1s; }
+  .call-item:nth-child(2) { animation-delay: 0.3s; }
+  .call-item:nth-child(3) { animation-delay: 0.5s; }
+  .call-item:nth-child(4) { animation-delay: 0.7s; }
+  .call-item:nth-child(5) { animation-delay: 0.9s; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .call-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .icon-green { background: rgba(40,200,100,0.15); color: #28c864; }
+  .icon-orange { background: rgba(232,115,26,0.15); color: var(--copper); }
+  .icon-teal { background: rgba(18,212,200,0.15); color: var(--teal); }
+  .icon-blue { background: rgba(80,120,255,0.15); color: #7090ff; }
+
+  .call-info { flex: 1; }
+  .call-name { font-size: 13px; font-weight: 600; color: var(--white); }
+  .call-desc { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .call-badge {
+    font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 100px;
+    letter-spacing: 0.05em;
+  }
+  .badge-live { background: rgba(40,200,100,0.15); color: #28c864; }
+  .badge-ai { background: rgba(232,115,26,0.15); color: var(--copper); }
+  .badge-done { background: rgba(90,96,112,0.2); color: var(--text3); }
+  .badge-ivr { background: rgba(18,212,200,0.15); color: var(--teal); }
+
+  .card-footer {
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .card-footer-label { font-size: 11px; color: var(--text3); }
+  .card-footer-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--copper); }
+
+  .floating-badge {
+    position: absolute; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px; font-size: 12px; font-weight: 600;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 8px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .badge-top { top: -20px; right: -30px; color: var(--teal); }
+  .badge-bot { bottom: -20px; left: -30px; color: var(--copper); }
+
+  /* ─── Logos ─── */
+  .logos-section { padding: 40px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .logos-label { font-size: 12px; color: var(--text3); text-align: center; margin-bottom: 28px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .logos-row { display: flex; align-items: center; justify-content: center; gap: 48px; flex-wrap: wrap; }
+  .logo-item { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text3); opacity: 0.5; letter-spacing: 0.05em; }
+
+  /* ─── Problem ─── */
+  #problem { background: var(--bg); }
+  .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .problem-cards { display: grid; gap: 16px; }
+  .problem-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 24px; display: flex; align-items: flex-start; gap: 16px;
+    transition: border-color var(--transition);
+  }
+  .problem-card:hover { border-color: rgba(232,115,26,0.3); }
+  .problem-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+  .problem-card h4 { font-size: 16px; color: var(--white); margin-bottom: 6px; font-weight: 700; }
+  .problem-card p { font-size: 14px; color: var(--text2); line-height: 1.6; }
+  .problem-text h2 { font-size: clamp(32px, 3.5vw, 48px); color: var(--white); margin-bottom: 20px; }
+  .problem-text p { font-size: 16px; color: var(--text2); line-height: 1.7; margin-bottom: 16px; }
+  .highlight-stat {
+    display: inline-block; background: var(--copper-glow); border: 1px solid rgba(232,115,26,0.3);
+    color: var(--copper2); padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 15px;
+  }
+
+  /* ─── How It Works ─── */
+  #how-it-works { background: var(--bg2); }
+  .section-header { text-align: center; max-width: 640px; margin: 0 auto 72px; }
+  .section-header h2 { font-size: clamp(32px, 3.5vw, 48px); color: var(--white); margin-bottom: 16px; }
+  .section-header p { font-size: 17px; color: var(--text2); line-height: 1.7; }
+
+  .steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; position: relative; }
+  .steps::before {
+    content: ''; position: absolute; top: 40px; left: 12%; right: 12%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--copper), transparent);
+    opacity: 0.4;
+  }
+  .step {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 32px 24px; text-align: center; position: relative;
+    transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+  }
+  .step:hover { transform: translateY(-6px); border-color: rgba(232,115,26,0.4); box-shadow: 0 20px 60px rgba(232,115,26,0.1); }
+  .step-num {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--copper), var(--copper2));
+    color: white; font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; box-shadow: 0 8px 30px rgba(232,115,26,0.4);
+  }
+  .step-icon { font-size: 28px; margin-bottom: 12px; }
+  .step h3 { font-size: 18px; color: var(--white); margin-bottom: 10px; }
+  .step p { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+  /* ─── Features ─── */
+  #features { background: var(--bg); }
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .feature-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 32px; transition: all var(--transition); position: relative; overflow: hidden;
+  }
+  .feature-card::after {
+    content: ''; position: absolute; inset: 0; opacity: 0;
+    background: radial-gradient(circle at top left, rgba(232,115,26,0.08) 0%, transparent 60%);
+    transition: opacity var(--transition);
+  }
+  .feature-card:hover { border-color: rgba(232,115,26,0.35); transform: translateY(-4px); }
+  .feature-card:hover::after { opacity: 1; }
+  .feature-card.featured {
+    border-color: rgba(232,115,26,0.4); grid-column: span 1;
+    background: linear-gradient(135deg, rgba(232,115,26,0.08) 0%, var(--panel) 50%);
+  }
+  .feature-emoji { font-size: 32px; margin-bottom: 16px; }
+  .feature-card h3 { font-size: 20px; color: var(--white); margin-bottom: 10px; }
+  .feature-card p { font-size: 14px; color: var(--text2); line-height: 1.65; }
+  .feature-tag {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--copper); border: 1px solid rgba(232,115,26,0.3);
+    padding: 3px 10px; border-radius: 100px; margin-bottom: 12px;
+  }
+
+  .features-big { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+  .feature-big {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 40px; display: flex; gap: 28px; align-items: flex-start;
+    transition: all var(--transition);
+  }
+  .feature-big:hover { border-color: rgba(232,115,26,0.35); transform: translateY(-3px); }
+  .feature-big-icon {
+    width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 24px;
+  }
+  .bg-copper { background: rgba(232,115,26,0.15); }
+  .bg-teal { background: rgba(18,212,200,0.12); }
+  .feature-big h3 { font-size: 20px; color: var(--white); margin-bottom: 10px; }
+  .feature-big p { font-size: 14px; color: var(--text2); line-height: 1.65; }
+  .feature-list { list-style: none; margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .feature-list li { font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+  .feature-list li::before { content: '→'; color: var(--copper); font-weight: 700; }
+
+  /* ─── Pricing ─── */
+  #pricing { background: var(--bg2); }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .price-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 36px 32px; transition: all var(--transition); position: relative;
+  }
+  .price-card:hover { transform: translateY(-4px); box-shadow: 0 24px 60px rgba(0,0,0,0.3); }
+  .price-card.popular {
+    border-color: var(--copper); background: linear-gradient(135deg, rgba(232,115,26,0.1) 0%, var(--panel) 40%);
+    transform: scale(1.03);
+  }
+  .price-card.popular:hover { transform: scale(1.03) translateY(-4px); }
+  .popular-tag {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--copper); color: white; font-size: 11px; font-weight: 700;
+    padding: 4px 16px; border-radius: 100px; letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .price-plan { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; }
+  .price-amount { display: flex; align-items: flex-end; gap: 4px; margin-bottom: 8px; }
+  .price-dollar { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text2); align-self: flex-start; padding-top: 10px; }
+  .price-num { font-family: 'Syne', sans-serif; font-size: 56px; font-weight: 800; color: var(--white); line-height: 1; }
+  .price-period { font-size: 14px; color: var(--text3); margin-bottom: 6px; }
+  .price-desc { font-size: 14px; color: var(--text2); margin-bottom: 28px; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 20px; }
+  .price-features { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 12px; }
+  .price-features li { font-size: 14px; color: var(--text2); display: flex; align-items: center; gap: 10px; }
+  .check { color: #28c864; font-size: 16px; }
+  .price-btn {
+    width: 100%; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; border: none;
+    transition: all var(--transition); text-align: center; text-decoration: none; display: block;
+  }
+  .price-btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .price-btn-outline:hover { border-color: var(--copper); color: var(--copper); }
+  .price-btn-fill { background: var(--copper); color: white; box-shadow: 0 8px 30px rgba(232,115,26,0.35); }
+  .price-btn-fill:hover { background: var(--copper2); transform: translateY(-1px); }
+
+  .pricing-note { text-align: center; margin-top: 32px; font-size: 14px; color: var(--text3); }
+  .pricing-note a { color: var(--copper); text-decoration: none; }
+
+  /* ─── ROI Calculator ─── */
+  #roi { background: var(--bg); }
+  .roi-wrapper {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 24px;
+    padding: 60px; max-width: 900px; margin: 0 auto;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+  }
+  .roi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 40px; }
+  .roi-inputs { display: flex; flex-direction: column; gap: 24px; }
+
+  .input-group { }
+  .input-label {
+    font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .input-val { font-family: 'Syne', sans-serif; color: var(--copper); font-size: 16px; }
+  input[type="range"] {
+    width: 100%; -webkit-appearance: none; appearance: none;
+    height: 4px; background: var(--border); border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--copper); cursor: pointer; box-shadow: 0 0 12px rgba(232,115,26,0.5);
+    transition: transform var(--transition);
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  .roi-results { display: flex; flex-direction: column; gap: 16px; }
+  .roi-result-card {
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px;
+  }
+  .roi-result-card.highlight {
+    background: var(--copper-glow); border-color: rgba(232,115,26,0.35);
+  }
+  .roi-result-label { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .roi-result-val {
+    font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: var(--white);
+  }
+  .roi-result-card.highlight .roi-result-val { color: var(--copper); }
+  .roi-result-note { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+  /* ─── Testimonials ─── */
+  #testimonials { background: var(--bg2); }
+  .testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+  .testi-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 32px; transition: all var(--transition);
+  }
+  .testi-card:hover { border-color: rgba(232,115,26,0.3); transform: translateY(-3px); }
+  .stars { color: var(--copper); font-size: 14px; margin-bottom: 16px; }
+  .testi-text { font-size: 15px; color: var(--text2); line-height: 1.7; margin-bottom: 24px; font-style: italic; }
+  .testi-author { display: flex; align-items: center; gap: 12px; }
+  .testi-avatar {
+    width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0;
+  }
+  .av1 { background: linear-gradient(135deg,#e8731a,#f59840); color: white; }
+  .av2 { background: linear-gradient(135deg,#12d4c8,#0ea5e9); color: white; }
+  .av3 { background: linear-gradient(135deg,#7c3aed,#a855f7); color: white; }
+  .testi-name { font-size: 14px; font-weight: 600; color: var(--white); }
+  .testi-biz { font-size: 12px; color: var(--text3); }
+
+  /* ─── FAQ ─── */
+  #faq { background: var(--bg); }
+  .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 860px; margin: 0 auto; }
+  .faq-item {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .faq-q {
+    padding: 20px 24px; font-size: 15px; font-weight: 600; color: var(--white);
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    transition: background var(--transition);
+  }
+  .faq-q:hover { background: rgba(255,255,255,0.03); }
+  .faq-icon { font-size: 18px; color: var(--copper); transition: transform var(--transition); flex-shrink: 0; }
+  .faq-a {
+    max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding var(--transition);
+    padding: 0 24px; font-size: 14px; color: var(--text2); line-height: 1.65;
+  }
+  .faq-item.open .faq-a { max-height: 200px; padding: 0 24px 20px; }
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+  /* ─── Contact ─── */
+  #contact { background: var(--bg2); }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+  .contact-info h2 { font-size: clamp(28px, 3vw, 42px); color: var(--white); margin-bottom: 16px; }
+  .contact-info p { font-size: 16px; color: var(--text2); line-height: 1.7; margin-bottom: 32px; }
+  .contact-channels { display: flex; flex-direction: column; gap: 16px; }
+  .channel {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 20px;
+  }
+  .channel-icon { font-size: 20px; }
+  .channel-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; }
+  .channel-val { font-size: 15px; font-weight: 600; color: var(--white); }
+
+  .contact-form {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 40px;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .form-group label { font-size: 13px; font-weight: 600; color: var(--text2); }
+  .form-group input, .form-group select, .form-group textarea {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+    padding: 12px 16px; outline: none; transition: border-color var(--transition);
+    width: 100%;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--copper);
+  }
+  .form-group select { cursor: pointer; }
+  .form-group select option { background: var(--bg3); }
+  .form-group textarea { resize: vertical; min-height: 100px; }
+  .form-submit {
+    width: 100%; padding: 14px; background: var(--copper); color: white;
+    border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all var(--transition);
+    box-shadow: 0 8px 30px rgba(232,115,26,0.3);
+  }
+  .form-submit:hover { background: var(--copper2); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(232,115,26,0.4); }
+  .form-note { font-size: 12px; color: var(--text3); text-align: center; margin-top: 12px; }
+
+  /* ─── CTA Band ─── */
+  .cta-band {
+    padding: 80px 0; background: var(--bg3);
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .cta-band::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(232,115,26,0.12) 0%, transparent 65%);
+  }
+  .cta-band h2 { font-size: clamp(32px, 4vw, 54px); color: var(--white); margin-bottom: 16px; }
+  .cta-band p { font-size: 18px; color: var(--text2); margin-bottom: 36px; max-width: 520px; margin-left: auto; margin-right: auto; }
+
+  /* ─── Footer ─── */
+  footer {
+    background: var(--bg); border-top: 1px solid var(--border);
+    padding: 60px 0 32px;
+  }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+  .footer-brand p { font-size: 14px; color: var(--text3); line-height: 1.7; margin-top: 14px; max-width: 280px; }
+  .footer-col h4 { font-size: 13px; font-weight: 700; color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col ul li a { font-size: 14px; color: var(--text3); text-decoration: none; transition: color var(--transition); }
+  .footer-col ul li a:hover { color: var(--copper); }
+  .footer-bottom {
+    border-top: 1px solid var(--border); padding-top: 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; color: var(--text3);
+  }
+  .footer-bottom a { color: var(--text3); text-decoration: none; }
+  .footer-bottom a:hover { color: var(--copper); }
+
+  /* ─── Scroll reveal ─── */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ─── Toast notification ─── */
+  .toast {
+    position: fixed; bottom: 32px; right: 32px; z-index: 9000;
+    background: var(--panel); border: 1px solid rgba(40,200,100,0.4); border-radius: var(--radius);
+    padding: 16px 20px; font-size: 14px; color: var(--white);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    transform: translateY(20px); opacity: 0;
+    transition: all 0.4s ease; pointer-events: none;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-icon { color: #28c864; font-size: 18px; }
+
+  /* ─── Mobile nav menu ─── */
+  .mobile-menu {
+    position: fixed; inset: 0; background: rgba(10,12,16,0.97); z-index: 999;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 32px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .mobile-menu.open { opacity: 1; pointer-events: all; }
+  .mobile-menu a { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--white); text-decoration: none; }
+  .mobile-menu a:hover { color: var(--copper); }
+  .mobile-close { position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--white); font-size: 28px; cursor: pointer; }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 1024px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 60px; }
+    .hero-visual { order: -1; }
+    .phone-card { width: 100%; max-width: 380px; }
+    .steps { grid-template-columns: repeat(2,1fr); }
+    .steps::before { display: none; }
+    .features-grid { grid-template-columns: repeat(2,1fr); }
+    .features-big { grid-template-columns: 1fr; }
+    .testi-grid { grid-template-columns: repeat(2,1fr); }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    section { padding: 72px 0; }
+    .nav-links { display: none; }
+    .nav-cta { display: none; }
+    .nav-mobile-btn { display: block; }
+    .hero-stats { flex-direction: column; gap: 20px; }
+    .problem-grid { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .price-card.popular { transform: none; }
+    .price-card.popular:hover { transform: translateY(-4px); }
+    .roi-wrapper { padding: 32px 24px; }
+    .roi-grid { grid-template-columns: 1fr; gap: 36px; }
+    .testi-grid { grid-template-columns: 1fr; }
+    .faq-grid { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#home" class="logo">
+      <div class="logo-icon">🔧</div>
+      Pipe<span>Profit</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#roi">ROI Calculator</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">Get Started Free →</a>
+    <button class="nav-mobile-btn" onclick="toggleMenu()" aria-label="Open menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="toggleMenu()">✕</button>
+  <a href="#home" onclick="toggleMenu()">Home</a>
+  <a href="#features" onclick="toggleMenu()">Features</a>
+  <a href="#pricing" onclick="toggleMenu()">Pricing</a>
+  <a href="#roi" onclick="toggleMenu()">ROI Calculator</a>
+  <a href="#contact" onclick="toggleMenu()">Contact</a>
+</div>
+
+<!-- ─── HERO ─── -->
+<section id="home">
+  <div class="hero-bg">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <svg class="pipe-lines" viewBox="0 0 600 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 200 Q150 200 150 350 Q150 500 300 500 L600 500" stroke="white" stroke-width="2"/>
+      <path d="M0 400 Q100 400 100 300 Q100 200 250 200 L600 200" stroke="white" stroke-width="1.5"/>
+      <path d="M600 100 Q450 100 450 250 Q450 400 300 400 Q150 400 150 550 L0 550" stroke="white" stroke-width="1"/>
+      <circle cx="150" cy="350" r="8" fill="white" opacity="0.6"/>
+      <circle cx="300" cy="500" r="8" fill="white" opacity="0.4"/>
+      <circle cx="100" cy="300" r="6" fill="white" opacity="0.5"/>
+      <circle cx="450" cy="250" r="6" fill="white" opacity="0.3"/>
+    </svg>
+  </div>
+
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-badge">🚿 Built Exclusively for US Plumbers</div>
+        <h1 class="hero-title">
+          Stop Losing Jobs<br>
+          <span class="line2">to a Missed Call.</span>
+        </h1>
+        <p class="hero-sub">
+          PipeProfit gives your plumbing business a 24/7 intelligent call system — smart IVR menus plus an AI backup assistant — so every lead gets answered, every single time.
+        </p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn-primary">Start Answering Every Call →</a>
+          <a href="#how-it-works" class="btn-secondary">▶ See How It Works</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-num">87<span>%</span></div>
+            <div class="stat-label">Callers don't call back</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">$<span>350</span></div>
+            <div class="stat-label">Avg. missed job value</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">24<span>/7</span></div>
+            <div class="stat-label">Always-on coverage</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="phone-card">
+          <div class="phone-header">
+            <div class="phone-dot dot-r"></div>
+            <div class="phone-dot dot-y"></div>
+            <div class="phone-dot dot-g"></div>
+            <span style="margin-left:8px;font-size:12px;color:var(--text3);font-weight:600;">PipeProfit Dashboard</span>
+          </div>
+
+          <div class="call-item">
+            <div class="call-icon icon-green">📞</div>
+            <div class="call-info">
+              <div class="call-name">John D. — Burst Pipe</div>
+              <div class="call-desc">IVR → Emergency → Booked</div>
+            </div>
+            <span class="call-badge badge-ivr">IVR</span>
+          </div>
+          <div class="call-item">
+            <div class="call-icon icon-orange">🤖</div>
+            <div class="call-info">
+              <div class="call-name">Sarah M. — Water Heater</div>
+              <div class="call-desc">AI handled after hours</div>
+            </div>
+            <span class="call-badge badge-ai">AI</span>
+          </div>
+          <div class="call-item">
+            <div class="call-icon icon-green">📞</div>
+            <div class="call-info">
+              <div class="call-name">Mike R. — Drain Clog</div>
+              <div class="call-desc">Routed to technician</div>
+            </div>
+            <span class="call-badge badge-live">LIVE</span>
+          </div>
+          <div class="call-item">
+            <div class="call-icon icon-orange">🤖</div>
+            <div class="call-info">
+              <div class="call-name">Carol T. — Quote Request</div>
+              <div class="call-desc">AI collected details + email</div>
+            </div>
+            <span class="call-badge badge-ai">AI</span>
+          </div>
+          <div class="call-item">
+            <div class="call-icon icon-teal">✅</div>
+            <div class="call-info">
+              <div class="call-name">Tom W. — Toilet Repair</div>
+              <div class="call-desc">Appointment scheduled</div>
+            </div>
+            <span class="call-badge badge-done">DONE</span>
+          </div>
+
+          <div class="card-footer">
+            <div>
+              <div class="card-footer-label">Today's Captured Revenue</div>
+              <div class="card-footer-val">$2,840</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="card-footer-label">Calls Answered</div>
+              <div class="card-footer-val" style="color:var(--teal)">100%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="floating-badge badge-top">
+          <span>🤖</span> AI picked up in 1 ring
+        </div>
+        <div class="floating-badge badge-bot">
+          <span>💰</span> $350 job saved at 11pm
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── LOGOS ─── -->
+<div class="logos-section">
+  <div class="container">
+    <div class="logos-label">Trusted by plumbing businesses across the US</div>
+    <div class="logos-row">
+      <div class="logo-item">RAPID FLOW PLUMBING</div>
+      <div class="logo-item">DRAINWORKS PRO</div>
+      <div class="logo-item">BLUE RIDGE PIPE</div>
+      <div class="logo-item">CLEAR STREAM CO.</div>
+      <div class="logo-item">FIRST FLUSH PLUMBERS</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── PROBLEM ─── -->
+<section id="problem">
+  <div class="container">
+    <div class="problem-grid reveal">
+      <div class="problem-text">
+        <div class="label">The Problem</div>
+        <h2>Your Phone Is Costing You More Than You Think</h2>
+        <p>Every time a call goes unanswered — because you're on a job, after hours, or slammed — that's a homeowner dialing your competitor instead.</p>
+        <p>They won't leave a voicemail. They won't call back. They'll just <span class="highlight-stat">book the next guy who picks up.</span></p>
+        <p>For the average plumber, that's 3–8 missed leads per week. At $350 a job, you're leaving <strong style="color:var(--white)">$1,050–$2,800 per week</strong> on the table.</p>
+      </div>
+      <div class="problem-cards">
+        <div class="problem-card">
+          <div class="problem-icon">📵</div>
+          <div>
+            <h4>Calls Missed On the Job</h4>
+            <p>You can't answer a call while you're knee-deep under a sink. Those leads vanish instantly.</p>
+          </div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">🌙</div>
+          <div>
+            <h4>After-Hours Emergencies Walk Away</h4>
+            <p>Pipe bursts don't wait until 9am. Without coverage, that emergency booking goes to whoever answers.</p>
+          </div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">🔁</div>
+          <div>
+            <h4>Repeat Callers Get Frustrated</h4>
+            <p>When the phone rings busy or goes to a generic voicemail, customers assume you're unprofessional — or out of business.</p>
+          </div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">📋</div>
+          <div>
+            <h4>No System = No Scaling</h4>
+            <p>Without a call intake system, every new lead is chaos. You can't grow what you can't manage.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section id="how-it-works">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="label">How It Works</div>
+      <h2>From Ring to Booked Job in 60 Seconds</h2>
+      <p>PipeProfit's two-layer system handles every inbound call — whether you're on a job, sleeping, or off for the weekend.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <div class="step-icon">📞</div>
+        <h3>Customer Calls</h3>
+        <p>Your customer dials your existing number. PipeProfit intercepts the call instantly — no forwarding delays, no dead air.</p>
+      </div>
+      <div class="step reveal" style="transition-delay:0.1s">
+        <div class="step-num">2</div>
+        <div class="step-icon">🎛️</div>
+        <h3>IVR Routes Them</h3>
+        <p>A professional IVR menu greets them and routes based on need — emergency, booking, quote, or existing job — instantly.</p>
+      </div>
+      <div class="step reveal" style="transition-delay:0.2s">
+        <div class="step-num">3</div>
+        <div class="step-icon">🤖</div>
+        <h3>AI Takes the Overflow</h3>
+        <p>If no tech is available or it's after hours, your AI assistant steps in — captures details, qualifies the lead, books the slot.</p>
+      </div>
+      <div class="step reveal" style="transition-delay:0.3s">
+        <div class="step-num">4</div>
+        <div class="step-icon">💰</div>
+        <h3>You Get the Job</h3>
+        <p>You receive a notification with the lead summary, contact info, and appointment time. Zero missed revenue.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURES ─── -->
+<section id="features">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="label">Features</div>
+      <h2>Everything a Plumbing Business Needs to Never Miss a Lead</h2>
+      <p>Two powerful systems working together, purpose-built for how plumbers actually work.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card featured reveal">
+        <div class="feature-tag">IVR SYSTEM</div>
+        <div class="feature-emoji">🎛️</div>
+        <h3>Smart IVR Call Menus</h3>
+        <p>Custom-built call trees that route customers to the right place in seconds. Emergency line, booking, quotes, repeat customers — all handled automatically.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.1s">
+        <div class="feature-tag">AI ASSISTANT</div>
+        <div class="feature-emoji">🤖</div>
+        <h3>24/7 AI Backup Assistant</h3>
+        <p>When your team's unavailable, the AI answers in your brand's voice, qualifies leads, collects info, and schedules jobs — even at 3am.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.2s">
+        <div class="feature-tag">INSTANT ALERTS</div>
+        <div class="feature-emoji">🔔</div>
+        <h3>Real-Time Lead Notifications</h3>
+        <p>Get a text or email the moment a new lead comes in — with name, issue, address, and urgency level — so you can follow up in minutes, not hours.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.3s">
+        <div class="feature-tag">SCHEDULING</div>
+        <div class="feature-emoji">📅</div>
+        <h3>Automated Job Scheduling</h3>
+        <p>The AI can check your availability and book appointments directly into your calendar — no back-and-forth phone tag required.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.4s">
+        <div class="feature-tag">EMERGENCY</div>
+        <div class="feature-emoji">🚨</div>
+        <h3>Emergency Call Escalation</h3>
+        <p>Urgent calls — burst pipes, gas leaks, flooding — get flagged and escalated immediately, not lost in a queue.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.5s">
+        <div class="feature-tag">ANALYTICS</div>
+        <div class="feature-emoji">📊</div>
+        <h3>Call Intelligence Dashboard</h3>
+        <p>See call volume, peak hours, AI vs IVR handling, missed revenue recovery, and lead quality — all in one clear dashboard.</p>
+      </div>
+    </div>
+
+    <div class="features-big">
+      <div class="feature-big reveal">
+        <div class="feature-big-icon bg-copper">🔧</div>
+        <div>
+          <h3>White-Glove Setup & Onboarding</h3>
+          <p>Our team handles everything. We build your IVR scripts, train your AI assistant on your services and pricing, and test the full system before you go live.</p>
+          <ul class="feature-list">
+            <li>Custom IVR script writing</li>
+            <li>AI trained on your service menu</li>
+            <li>Number porting or new number setup</li>
+            <li>Live in 72 hours</li>
+          </ul>
+        </div>
+      </div>
+      <div class="feature-big reveal" style="transition-delay:0.1s">
+        <div class="feature-big-icon bg-teal">🔗</div>
+        <div>
+          <h3>Integrates With Your Existing Tools</h3>
+          <p>PipeProfit works alongside the software you already use — no ripping and replacing your entire stack.</p>
+          <ul class="feature-list">
+            <li>Google Calendar & Apple Calendar</li>
+            <li>ServiceTitan, Housecall Pro, Jobber</li>
+            <li>QuickBooks for invoice tracking</li>
+            <li>SMS & email notifications</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ─── ROI CALCULATOR ─── -->
+<section id="roi">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="label">ROI Calculator</div>
+      <h2>See Exactly What Missed Calls Are Costing You</h2>
+      <p>Drag the sliders below to calculate your potential revenue recovery with PipeProfit.</p>
+    </div>
+    <div class="roi-wrapper reveal">
+      <div class="roi-grid">
+        <div class="roi-inputs">
+          <div class="input-group">
+            <div class="input-label">
+              <span>Weekly Inbound Calls</span>
+              <span class="input-val" id="callsVal">40 calls/wk</span>
+            </div>
+            <input type="range" id="callsRange" min="5" max="200" value="40" step="5" oninput="calcROI()">
+          </div>
+          <div class="input-group">
+            <div class="input-label">
+              <span>Current Answer Rate</span>
+              <span class="input-val" id="answerVal">65%</span>
+            </div>
+            <input type="range" id="answerRange" min="20" max="95" value="65" step="5" oninput="calcROI()">
+          </div>
+          <div class="input-group">
+            <div class="input-label">
+              <span>Average Job Value</span>
+              <span class="input-val" id="jobValDisplay">$350</span>
+            </div>
+            <input type="range" id="jobValRange" min="100" max="2000" value="350" step="25" oninput="calcROI()">
+          </div>
+          <div class="input-group">
+            <div class="input-label">
+              <span>Booking Conversion Rate</span>
+              <span class="input-val" id="convVal">45%</span>
+            </div>
+            <input type="range" id="convRange" min="10" max="80" value="45" step="5" oninput="calcROI()">
+          </div>
+          <div class="input-group">
+            <div class="input-label">
+              <span>Your PipeProfit Plan</span>
+              <span class="input-val" id="planVal">$397/mo</span>
+            </div>
+            <input type="range" id="planRange" min="0" max="2" value="1" step="1" oninput="calcROI()">
+          </div>
+        </div>
+
+        <div class="roi-results">
+          <div class="roi-result-card">
+            <div class="roi-result-label">Calls You're Currently Missing</div>
+            <div class="roi-result-val" id="missedCalls">14 / week</div>
+            <div class="roi-result-note">Based on your current answer rate</div>
+          </div>
+          <div class="roi-result-card">
+            <div class="roi-result-label">Weekly Revenue Being Left Behind</div>
+            <div class="roi-result-val" id="weeklyLoss">$2,205</div>
+            <div class="roi-result-note">Missed calls × conversion rate × job value</div>
+          </div>
+          <div class="roi-result-card">
+            <div class="roi-result-label">Monthly Revenue Recovered with PipeProfit</div>
+            <div class="roi-result-val" id="monthlyRecovery">$8,820</div>
+            <div class="roi-result-note">Assuming 85% answer rate improvement</div>
+          </div>
+          <div class="roi-result-card highlight">
+            <div class="roi-result-label">🔥 Net Monthly Profit After PipeProfit Cost</div>
+            <div class="roi-result-val" id="netProfit">$8,423</div>
+            <div class="roi-result-note">Your ROI after subscription cost</div>
+          </div>
+          <div class="roi-result-card">
+            <div class="roi-result-label">Return on Investment (Monthly)</div>
+            <div class="roi-result-val" id="roiPct" style="color:var(--teal)">2,122%</div>
+            <div class="roi-result-note">Revenue recovered ÷ subscription cost</div>
+          </div>
+          <a href="#contact" class="btn-primary" style="margin-top:8px;justify-content:center;">Capture This Revenue →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ─── -->
+<section id="testimonials">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="label">Testimonials</div>
+      <h2>Real Plumbers. Real Revenue.</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"I used to miss 5–6 calls a day when I was on the job. PipeProfit's AI answers every single one now. Last month it booked me 11 jobs I would have completely lost. Paid for itself in the first week."</p>
+        <div class="testi-author">
+          <div class="testi-avatar av1">MR</div>
+          <div>
+            <div class="testi-name">Mike Reynolds</div>
+            <div class="testi-biz">Reynolds Plumbing, Austin TX</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal" style="transition-delay:0.1s">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"The IVR menu made us look like a real company, not just one guy with a truck. Customers call back and say 'Wow, you're professional.' We've closed 30% more jobs since switching."</p>
+        <div class="testi-author">
+          <div class="testi-avatar av2">DK</div>
+          <div>
+            <div class="testi-name">Diana Kim</div>
+            <div class="testi-biz">DK Drain Solutions, Charlotte NC</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal" style="transition-delay:0.2s">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"The emergency escalation feature alone is worth it. We had a call at 2am — the AI captured the info, texted my on-call tech, and we were on site in 40 minutes. That job was over $1,800."</p>
+        <div class="testi-author">
+          <div class="testi-avatar av3">TB</div>
+          <div>
+            <div class="testi-name">Tom Briggs</div>
+            <div class="testi-biz">Briggs & Sons Plumbing, Denver CO</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FAQ ─── -->
+<section id="faq">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="label">FAQ</div>
+      <h2>Questions We Get All the Time</h2>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Do I need to change my phone number?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">Nope. We port your existing number or set up a new local number — your choice. Your customers keep calling the same number they always have.</div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How long does setup take?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">Most businesses are live within 72 hours. Our team handles the entire setup — IVR scripting, AI training, and system testing — before you go live.</div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What if the AI says something wrong?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">We train the AI on your specific services, pricing ranges, and service area. If something needs to be updated, we adjust it — typically within 24 hours.</div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Is there a contract or lock-in?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">No contracts. All plans are month-to-month. You can cancel anytime with no penalties or fees. We keep you by delivering results, not by locking you in.</div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What happens when I'm available to take the call?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">The IVR tries to route the call to you first. The AI only kicks in when you or your team can't answer — it's a backup, not a replacement for human contact.</div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Does this work with my scheduling software?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">Yes. We integrate with most major field service platforms including ServiceTitan, Housecall Pro, and Jobber, as well as Google Calendar. Ask us about your specific tool.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA BAND ─── -->
+<div class="cta-band">
+  <div class="container" style="position:relative;">
+    <div class="label" style="justify-content:center;margin-bottom:20px;">Ready to Start?</div>
+    <h2>Your Competitors Are Answering.<br>Are You?</h2>
+    <p>Book A Free Call. No credit card, no commitment — just more booked jobs.</p>
+    <div class="hero-actions" style="justify-content:center;">
+      <a href="#contact" class="btn-primary" style="font-size:16px;padding:16px 36px;">Book A Free Call →</a>
+      <a href="tel:+14159699386" class="btn-secondary" style="font-size:15px;">📞 Call Us: +14159699386</a>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CONTACT ─── -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <div class="label">Contact Us</div>
+        <h2>Let's Get Your Calls Covered</h2>
+        <p>Fill out the form and our team will reach out within 24 hours to set up your free trial and build your custom IVR script — at no cost to you.</p>
+        <div class="contact-channels">
+          <div class="channel">
+            <div class="channel-icon">📞</div>
+            <div>
+              <div class="channel-label">Phone</div>
+              <div class="channel-val">+14159699386</div>
+            </div>
+          </div>
+          <div class="channel">
+            <div class="channel-icon">✉️</div>
+            <div>
+              <div class="channel-label">Email</div>
+              <div class="channel-val">business@rayyanali.site</div>
+            </div>
+          </div>
+          <div class="channel">
+            <div class="channel-icon">💬</div>
+            <div>
+              <div class="channel-label">Response Time</div>
+              <div class="channel-val">Within 24 hours — usually faster</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form reveal" style="transition-delay:0.1s">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="firstName" placeholder="John">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="lastName" placeholder="Smith">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Business Name</label>
+          <input type="text" id="bizName" placeholder="Smith Plumbing LLC">
+        </div>
+        <div class="form-group">
+          <label>Business Phone</label>
+          <input type="tel" id="bizPhone" placeholder="(555) 000-0000">
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="bizEmail" placeholder="john@smithplumbing.com">
+        </div>
+        <div class="form-group">
+          <label>How many calls do you receive per week?</label>
+          <select id="callVolume">
+            <option value="">Select...</option>
+            <option value="under20">Under 20</option>
+            <option value="20-50">20–50 calls</option>
+            <option value="50-100">50–100 calls</option>
+            <option value="100+">100+ calls</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Anything specific you want to solve? (optional)</label>
+          <textarea id="message" placeholder="e.g. after-hours coverage, emergency routing, reducing voicemails..."></textarea>
+        </div>
+        <button class="form-submit" onclick="submitForm()">
+          Book a Call →
+        </button>
+        <div class="form-note">🔒 No credit card required · No contracts · Cancel anytime</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#home" class="logo" style="text-decoration:none;">
+          <div class="logo-icon">🔧</div>
+          Pipe<span>Profit</span>
+        </a>
+        <p>The inbound call system built exclusively for local US plumbing businesses. IVR menus + AI backup assistant = zero missed leads.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#roi">ROI Calculator</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4></h4>
+        <ul>
+          <li><a href="#"></a></li>
+          <li><a href="#"></a></li>
+          <li><a href="#"></a></li>
+          <li><a href="#"></a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2025 PipeProfit. All rights reserved. Built for American plumbers.</div>
+      <div>
+        <a href="#"></a> &nbsp;·&nbsp;
+        <a href="#"></a> &nbsp;·&nbsp;
+        <a href="#"></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast notification -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✓</span>
+  <span id="toastMsg">Message sent! We'll be in touch within 24 hours.</span>
+</div>
+
+<script>
+  // ── Nav scroll effect ──
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    nav.style.borderBottomColor = window.scrollY > 50 ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.07)';
+  });
+
+  // ── Mobile menu ──
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+    document.body.style.overflow = document.getElementById('mobileMenu').classList.contains('open') ? 'hidden' : '';
+  }
+
+  // ── Scroll reveal ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── FAQ ──
+  function toggleFaq(el) {
+    const item = el.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // ── ROI Calculator ──
+  const planCosts = [197, 397, 697];
+  const planNames = ['$197/mo (Starter)', '$397/mo (Growth)', '$697/mo (Scale)'];
+
+  function calcROI() {
+    const calls   = +document.getElementById('callsRange').value;
+    const answer  = +document.getElementById('answerRange').value;
+    const jobVal  = +document.getElementById('jobValRange').value;
+    const conv    = +document.getElementById('convRange').value;
+    const planIdx = +document.getElementById('planRange').value;
+    const plan    = planCosts[planIdx];
+
+    document.getElementById('callsVal').textContent    = `${calls} calls/wk`;
+    document.getElementById('answerVal').textContent   = `${answer}%`;
+    document.getElementById('jobValDisplay').textContent = `$${jobVal}`;
+    document.getElementById('convVal').textContent     = `${conv}%`;
+    document.getElementById('planVal').textContent     = planNames[planIdx];
+
+    const missRate   = (100 - answer) / 100;
+    const convRate   = conv / 100;
+    const missedWk   = Math.round(calls * missRate);
+    const lossWk     = Math.round(missedWk * convRate * jobVal);
+    const recoverMo  = Math.round(lossWk * 4.33 * 0.85); // 85% improvement
+    const netProfMo  = recoverMo - plan;
+    const roiPct     = plan > 0 ? Math.round((recoverMo / plan) * 100) : 0;
+
+    document.getElementById('missedCalls').textContent  = `${missedWk} / week`;
+    document.getElementById('weeklyLoss').textContent   = `$${lossWk.toLocaleString()}`;
+    document.getElementById('monthlyRecovery').textContent = `$${recoverMo.toLocaleString()}`;
+    document.getElementById('netProfit').textContent    = `$${netProfMo.toLocaleString()}`;
+    document.getElementById('roiPct').textContent       = `${roiPct.toLocaleString()}%`;
+  }
+  calcROI();
+
+
+async function submitForm() {
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName  = document.getElementById('lastName').value.trim();
+  const bizName   = document.getElementById('bizName').value.trim();
+  const bizPhone  = document.getElementById('bizPhone').value.trim();
+  const email     = document.getElementById('bizEmail').value.trim();
+  const message   = document.getElementById('message').value.trim();
+  const callVolume = document.getElementById('callVolume').value;
+
+  // Validation
+  if (!firstName || !email) {
+    showToast('Please fill in your name and email to continue.', false);
+    return;
+  }
+
+  try {
+    // Send data to Google Sheets
+    await fetch('https://script.google.com/macros/s/AKfycby1jm4W42o7IPekfwFxf31Hinb9gjtI6Vw-oQBWqKrFPjp2ONz1W95xgwZhO44-J98AGw/exec', {
+      method: 'POST',
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        bizName,
+        bizPhone,
+        email,
+        message,
+        callVolume
+      })
+    });
+
+    // Success message
+    showToast(`Thanks ${firstName}! We'll email ${email} within 24 hours. 🎉`, true);
+
+    // Reset fields
+    ['firstName','lastName','bizName','bizPhone','bizEmail','message'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+
+    document.getElementById('callVolume').selectedIndex = 0;
+
+  } catch (err) {
+    console.error(err);
+    showToast('Error submitting form. Please try again.', false);
+  }
+}
+
+  function showToast(msg, success = true) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    toast.style.borderColor = success ? 'rgba(40,200,100,0.4)' : 'rgba(232,115,26,0.4)';
+    document.querySelector('.toast-icon').textContent = success ? '✓' : '⚠';
+    document.querySelector('.toast-icon').style.color = success ? '#28c864' : 'var(--copper)';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4500);
+  }
+
+  // ── Animated counter for hero stats on scroll ──
+  let statsAnimated = false;
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !statsAnimated) {
+        statsAnimated = true;
+        animateNumber('hero-stat-1', 0, 87, '%', 1500);
+        animateNumber('hero-stat-2', 0, 350, '$', 1800, true);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  function animateNumber(id, from, to, suffix, duration, prefix = false) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const start = performance.now();
+    function step(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = Math.round(from + (to - from) * eased);
+      el.textContent = prefix ? `$${val}` : `${val}${suffix}`;
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+</script>
+</body>
+</html>
