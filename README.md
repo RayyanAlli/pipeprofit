@@ -8,7 +8,7 @@
 
 **Helping businesses never lose money through missed calls by inbound building call systems.**
 
-[Live Demo](https://rayyanalli.github.io/pipeprofit/pipeprofit.html) |
+[Live Demo](https://pipeprofit.netlify.app/) |
 [Documentation](README.md)
 
 </div>
